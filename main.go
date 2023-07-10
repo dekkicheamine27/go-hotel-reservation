@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/godev/hotel-resevation/Api"
 	"github.com/godev/hotel-resevation/db"
 	"github.com/gofiber/fiber/v2"
@@ -24,7 +23,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(client)
 
 	userHandler := Api.NewUserHandler(db.NewMongoUserStore(client))
 
