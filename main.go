@@ -25,15 +25,33 @@ func main() {
 		log.Fatal(err)
 	}
 
-	userHandler := Api.NewUserHandler(db.NewMongoUserStore(client, DBNAME))
+	var (
+		hotelStore = db.NewMongoHotelStore(client, DBNAME)
+		roomStore  = db.NewMongoRoomStore(client, hotelStore)
+		userStore  = db.NewMongoUserStore(client)
+		store      = &db.Store{
+			User:  userStore,
+			Hotel: hotelStore,
+			Room:  roomStore,
+		}
+		userHandler  = Api.NewUserHandler(userStore)
+		hotelHandler = Api.NewHotelHandler(store)
 
-	app := fiber.New(config)
-	apiV1 := app.Group("/api/v1")
+		app   = fiber.New(config)
+		apiV1 = app.Group("/api/v1")
+	)
+
+	//user handlers
 	apiV1.Get("/users", userHandler.HandleGetUsers)
-	apiV1.Post("/users", userHandler.HandlePostUser)
 	apiV1.Get("/users/:id", userHandler.HandleGetUser)
+	apiV1.Post("/users", userHandler.HandlePostUser)
 	apiV1.Delete("users/:id", userHandler.HandleDeleteUser)
 	apiV1.Put("users/:id", userHandler.HandlePutUser)
+
+	//hotel Handlers
+	apiV1.Get("/hotels", hotelHandler.GetHotels)
+	apiV1.Get("/hotels/:id", hotelHandler.GetHotel)
+	apiV1.Get("/hotels/:id/rooms", hotelHandler.HandleGetRooms)
 
 	app.Listen(":5000")
 }

@@ -34,8 +34,8 @@ func (s *MongoUserStore) Drop(ctx context.Context) error {
 	return s.coll.Drop(ctx)
 }
 
-func NewMongoUserStore(client *mongo.Client, dbName string) *MongoUserStore {
-	return &MongoUserStore{client: client, coll: client.Database(dbName).Collection(UserColl)}
+func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
+	return &MongoUserStore{client: client, coll: client.Database(DBNAME).Collection(UserColl)}
 }
 
 func (s *MongoUserStore) UpdateUser(ctx context.Context, filters bson.M, update types.UpdateUserParams) error {
