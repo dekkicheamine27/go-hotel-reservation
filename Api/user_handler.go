@@ -70,7 +70,7 @@ func (u *UserHandler) HandlePostUser(ctx *fiber.Ctx) error {
 func (u *UserHandler) HandleGetUser(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	c := context.Background()
-	user, err := u.userStore.GetUserById(c, id)
+	user, err := u.userStore.GetUserByEmail(c, id)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return ctx.JSON(map[string]string{"error": "not found"})

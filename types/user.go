@@ -76,3 +76,7 @@ type User struct {
 	Email             string             `bson:"email" json:"email"`
 	EncryptedPassword string             `bson:"encryptedPassword" json:"-"`
 }
+
+func IsValidPassword(encpw, pw string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(encpw), []byte(pw)) == nil
+}
