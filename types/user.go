@@ -75,6 +75,7 @@ type User struct {
 	LastName          string             `bson:"lastName" json:"last_name"`
 	Email             string             `bson:"email" json:"email"`
 	EncryptedPassword string             `bson:"encryptedPassword" json:"-"`
+	IsAdmin           bool               `bson:"isAdmin" json:"isAdmin"`
 }
 
 func IsValidPassword(encpw, pw string) bool {

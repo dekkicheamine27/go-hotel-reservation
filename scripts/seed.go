@@ -28,6 +28,7 @@ func userSeed(fname, lname, email string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	user.IsAdmin = true
 	_, err = userStore.InsertUser(ctx, user)
 	if err != nil {
 		log.Fatal(err)
@@ -74,6 +75,7 @@ func hotelSeed(hotelName string, Location string, rating int) {
 
 func main() {
 	userSeed("dekkiche", "amine", "dekk@gmail.com")
+
 	hotelSeed("Safir", "Mostaganem", 3)
 	hotelSeed("AZ", "Oran", 4)
 	hotelSeed("sleep", "London", 1)

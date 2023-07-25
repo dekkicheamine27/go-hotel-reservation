@@ -2,29 +2,36 @@ package Api
 
 import (
 	"fmt"
+	"github.com/godev/hotel-resevation/db"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
 )
 
-func JWTAuthentication(ctx *fiber.Ctx) error {
-	fmt.Println("--JWT authentication")
-	token, ok := ctx.GetReqHeaders()["X-Api-Token"]
-	if !ok {
-		return fmt.Errorf("unauthorized")
+func JWTAuthentication(userStore db.UserStore) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		fmt.Println("--JWT authentication")
+		token, ok := ctx.GetReqHeaders()["X-Api-Token"]
+		if !ok {
+			return fmt.Errorf("unauthorized")
+		}
+
+		claims, err := parseJWTToken(token)
+
+		if err != nil {
+			return err
+		}
+
+		// Check token expiration
+		userID := claims["id"].(string)
+		user, err := userStore.GetUserById(ctx.Context(), userID)
+		if err != nil {
+			return err
+		}
+		ctx.Context().SetUserValue("user", user)
+
+		return ctx.Next()
 	}
-	fmt.Println("--->", token)
-
-	claims, err := parseJWTToken(token)
-
-	if err != nil {
-		return err
-	}
-
-	// Check token expiration
-
-	fmt.Println(claims)
-	return ctx.Next()
 }
 
 func parseJWTToken(tokenString string) (jwt.MapClaims, error) {

@@ -26,21 +26,27 @@ func main() {
 	}
 
 	var (
-		hotelStore = db.NewMongoHotelStore(client, DBNAME)
-		roomStore  = db.NewMongoRoomStore(client, hotelStore)
-		userStore  = db.NewMongoUserStore(client)
-		store      = &db.Store{
-			User:  userStore,
-			Hotel: hotelStore,
-			Room:  roomStore,
+		hotelStore   = db.NewMongoHotelStore(client, DBNAME)
+		roomStore    = db.NewMongoRoomStore(client, hotelStore)
+		userStore    = db.NewMongoUserStore(client)
+		bookingStore = db.NewMongoBookingStore(client)
+		store        = &db.Store{
+			User:    userStore,
+			Hotel:   hotelStore,
+			Room:    roomStore,
+			Booking: bookingStore,
 		}
-		userHandler  = Api.NewUserHandler(userStore)
-		hotelHandler = Api.NewHotelHandler(store)
-		authHandler  = Api.NewAuthHandler(userStore)
+		userHandler    = Api.NewUserHandler(userStore)
+		hotelHandler   = Api.NewHotelHandler(store)
+		authHandler    = Api.NewAuthHandler(userStore)
+		roomHandler    = Api.NewRoomHandler(store)
+		bookingHandler = Api.NewBookingHandler(store)
 
-		app   = fiber.New(config)
-		auth  = app.Group("/api")
-		apiV1 = app.Group("/api/v1", Api.JWTAuthentication)
+		app  = fiber.New(config)
+		auth = app.Group("/api")
+
+		apiV1 = app.Group("/api/v1", Api.JWTAuthentication(userStore))
+		admin = apiV1.Group("/admin", Api.AdminAuth)
 	)
 
 	//auth api routes
@@ -58,6 +64,17 @@ func main() {
 	apiV1.Get("/hotels", hotelHandler.GetHotels)
 	apiV1.Get("/hotels/:id", hotelHandler.GetHotel)
 	apiV1.Get("/hotels/:id/rooms", hotelHandler.HandleGetRooms)
+
+	//room Handlers
+	apiV1.Get("/rooms", roomHandler.HandleGetRooms)
+	apiV1.Post("/rooms/:id/book", roomHandler.HandleBookRoom)
+
+	//booking handlers
+
+	apiV1.Get("/bookings/:id", bookingHandler.HandleGetBooking)
+
+	//admin handlers
+	admin.Get("/bookings", bookingHandler.HandleGetBookings)
 
 	err = app.Listen(":5000")
 	if err != nil {
