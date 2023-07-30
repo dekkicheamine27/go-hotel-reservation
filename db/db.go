@@ -1,8 +1,10 @@
 package db
 
-const (
-	DBNAME = "hotel-resevation"
-	DURI   = "mongodb://localhost:27017"
+import "os"
+
+var (
+	DBNAME string
+	DURI   string
 )
 
 type Store struct {
@@ -10,4 +12,9 @@ type Store struct {
 	Hotel   HotelStore
 	Room    RoomStore
 	Booking BookingStore
+}
+
+func init() {
+	DBNAME = os.Getenv("MONGO_DB_NAME")
+	DURI = os.Getenv("MONGO_DB_URL")
 }

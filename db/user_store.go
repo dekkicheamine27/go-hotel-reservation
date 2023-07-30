@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"os"
 )
 
 const UserColl = "users"
@@ -36,7 +37,8 @@ func (s *MongoUserStore) Drop(ctx context.Context) error {
 }
 
 func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
-	return &MongoUserStore{client: client, coll: client.Database(DBNAME).Collection(UserColl)}
+	dbName := os.Getenv("MONGO_DB_NAME")
+	return &MongoUserStore{client: client, coll: client.Database(dbName).Collection(UserColl)}
 }
 
 func (s *MongoUserStore) UpdateUser(ctx context.Context, filters bson.M, update types.UpdateUserParams) error {

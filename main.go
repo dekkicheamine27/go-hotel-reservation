@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/godev/hotel-resevation/Api"
 	"github.com/godev/hotel-resevation/db"
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+	"os"
 )
 
 const dburi = "mongodb://localhost:27017"
@@ -18,7 +21,8 @@ var config = fiber.Config{
 }
 
 func main() {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dburi))
+	mongodbUrl := os.Getenv("MONGO_DB_URL")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongodbUrl))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,8 +79,16 @@ func main() {
 	//admin handlers
 	admin.Get("/bookings", bookingHandler.HandleGetBookings)
 
-	err = app.Listen(":5000")
+	listenAdrr := os.Getenv("HTTP_LISTEN_ADDRESS")
+	fmt.Println(listenAdrr)
+	err = app.Listen(listenAdrr)
 	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func init() {
+	if err := godotenv.Load(); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"os"
 )
 
 type RoomStore interface {
@@ -20,7 +21,8 @@ type MongoRoomStore struct {
 }
 
 func NewMongoRoomStore(client *mongo.Client, hotelStore HotelStore) *MongoRoomStore {
-	return &MongoRoomStore{client: client, coll: client.Database(DBNAME).Collection("rooms"), HotelStore: hotelStore}
+	dbName := os.Getenv("MONGO_DB_NAME")
+	return &MongoRoomStore{client: client, coll: client.Database(dbName).Collection("rooms"), HotelStore: hotelStore}
 }
 
 func (m *MongoRoomStore) GetRooms(ctx context.Context, filter bson.M) ([]*types.Room, error) {

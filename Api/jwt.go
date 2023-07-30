@@ -22,7 +22,6 @@ func JWTAuthentication(userStore db.UserStore) fiber.Handler {
 			return err
 		}
 
-		// Check token expiration
 		userID := claims["id"].(string)
 		user, err := userStore.GetUserById(ctx.Context(), userID)
 		if err != nil {

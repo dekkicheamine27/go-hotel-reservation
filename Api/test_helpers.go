@@ -3,7 +3,9 @@ package Api
 import (
 	"context"
 	"github.com/godev/hotel-resevation/db"
+	"github.com/joho/godotenv"
 	"log"
+	"os"
 	"testing"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,15 +18,18 @@ type testdb struct {
 }
 
 func (tdb *testdb) teardown(t *testing.T) {
-
-	if err := tdb.client.Database(db.DBNAME).Drop(context.TODO()); err != nil {
+	dbName := os.Getenv("MONGO_DB_NAME")
+	if err := tdb.client.Database(dbName).Drop(context.TODO()); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func setup(t *testing.T) *testdb {
-
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DURI))
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Fatal(err)
+	}
+	mongodbUri := os.Getenv("MONGO_DB_URL_TEST")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongodbUri))
 	if err != nil {
 		log.Fatal(err)
 	}

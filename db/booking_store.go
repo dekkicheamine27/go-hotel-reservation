@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"os"
 )
 
 type BookingStore interface {
@@ -22,7 +23,8 @@ type MongoBookingStore struct {
 }
 
 func NewMongoBookingStore(client *mongo.Client) *MongoBookingStore {
-	return &MongoBookingStore{client: client, coll: client.Database(DBNAME).Collection("bookings")}
+	dbName := os.Getenv("MONGO_DB_NAME")
+	return &MongoBookingStore{client: client, coll: client.Database(dbName).Collection("bookings")}
 }
 
 func (m *MongoBookingStore) GetBookings(ctx context.Context, filter bson.M) ([]*types.Booking, error) {
