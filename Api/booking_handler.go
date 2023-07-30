@@ -1,8 +1,8 @@
 package Api
 
 import (
+	"fmt"
 	"github.com/godev/hotel-resevation/db"
-	"github.com/godev/hotel-resevation/types"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
@@ -31,8 +31,8 @@ func (h *BookingHandler) HandleGetBooking(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	user, ok := ctx.Context().UserValue("user").(*types.User)
-	if !ok {
+	user, err := getAuthUser(ctx)
+	if err != nil {
 		return err
 	}
 
@@ -44,5 +44,32 @@ func (h *BookingHandler) HandleGetBooking(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.JSON(booking)
+
+}
+
+func (h *BookingHandler) HandleCancelBooking(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+	booking, err := h.store.Booking.GetBookingById(ctx.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	user, err := getAuthUser(ctx)
+	if err != nil {
+		return err
+	}
+
+	if user.ID != booking.UserID {
+		return ctx.Status(http.StatusUnauthorized).JSON(genericResp{
+			Type: "error",
+			Msg:  "not authorized",
+		})
+	}
+
+	if err := h.store.Booking.UpdateBooking(ctx.Context(), ctx.Params("id"), bson.M{"cancelled": true}); err != nil {
+		return fmt.Errorf("update book not working")
+	}
+
+	return ctx.JSON(genericResp{Msg: "updated", Type: "msg"})
 
 }

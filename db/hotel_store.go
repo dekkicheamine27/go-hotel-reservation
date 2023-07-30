@@ -20,8 +20,8 @@ type MongoHotelStore struct {
 	coll   *mongo.Collection
 }
 
-func NewMongoHotelStore(client *mongo.Client, dbName string) *MongoHotelStore {
-	return &MongoHotelStore{client: client, coll: client.Database(dbName).Collection("hotels")}
+func NewMongoHotelStore(client *mongo.Client) *MongoHotelStore {
+	return &MongoHotelStore{client: client, coll: client.Database(DBNAME).Collection("hotels")}
 }
 
 func (s *MongoHotelStore) GetHotel(ctx context.Context, filter bson.M) ([]*types.Hotel, error) {

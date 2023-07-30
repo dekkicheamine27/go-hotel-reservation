@@ -26,7 +26,7 @@ func main() {
 	}
 
 	var (
-		hotelStore   = db.NewMongoHotelStore(client, DBNAME)
+		hotelStore   = db.NewMongoHotelStore(client)
 		roomStore    = db.NewMongoRoomStore(client, hotelStore)
 		userStore    = db.NewMongoUserStore(client)
 		bookingStore = db.NewMongoBookingStore(client)
@@ -72,6 +72,7 @@ func main() {
 	//booking handlers
 
 	apiV1.Get("/bookings/:id", bookingHandler.HandleGetBooking)
+	apiV1.Get("/bookings/:id/cancel", bookingHandler.HandleCancelBooking)
 
 	//admin handlers
 	admin.Get("/bookings", bookingHandler.HandleGetBookings)

@@ -62,7 +62,7 @@ func (a *AuthHandler) HandleAuthenticate(ctx *fiber.Ctx) error {
 	if !ok {
 		return invalidCredentials(ctx)
 	}
-	token := createToken(user)
+	token := CreateToken(user)
 
 	resp := AuthResponse{
 		User:  user,
@@ -74,7 +74,7 @@ func (a *AuthHandler) HandleAuthenticate(ctx *fiber.Ctx) error {
 	return ctx.JSON(resp)
 }
 
-func createToken(user *types.User) string {
+func CreateToken(user *types.User) string {
 	now := time.Now()
 	expires := now.Add(time.Hour * 4).Unix()
 	claims := jwt.MapClaims{
