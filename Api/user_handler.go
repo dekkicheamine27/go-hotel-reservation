@@ -38,7 +38,7 @@ func (u *UserHandler) HandlePutUser(ctx *fiber.Ctx) error {
 
 	filter := bson.M{"_id": oid}
 	if err := ctx.BodyParser(&params); err != nil {
-		return err
+		return ErrBadRequest()
 	}
 
 	if err := u.userStore.UpdateUser(ctx.Context(), filter, params); err != nil {

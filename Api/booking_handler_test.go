@@ -23,7 +23,7 @@ func TestGetBooking(t *testing.T) {
 		from           = time.Now()
 		till           = from.AddDate(0, 0, 5)
 		booking        = fixtures.AddBooking(db.Store, user.ID, room.ID, from, till)
-		app            = fiber.New()
+		app            = fiber.New(fiber.Config{ErrorHandler: ErrorHandler})
 		jwt            = app.Group("/", JWTAuthentication(db.User))
 		bookingHandler = NewBookingHandler(db.Store)
 	)
@@ -117,7 +117,7 @@ func TestAdminGetBookings(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode != http.StatusUnauthorized {
 		t.Fatalf("expected not 200 status code, got %d", resp.StatusCode)
 	}
 }

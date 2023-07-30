@@ -14,9 +14,7 @@ const dburi = "mongodb://localhost:27017"
 const DBNAME = "hotel-resevation"
 
 var config = fiber.Config{
-	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-		return ctx.JSON(map[string]string{"error": err.Error()})
-	},
+	ErrorHandler: Api.ErrorHandler,
 }
 
 func main() {
@@ -43,13 +41,13 @@ func main() {
 		bookingHandler = Api.NewBookingHandler(store)
 
 		app  = fiber.New(config)
-		auth = app.Group("/api")
+		auth = app.Group("/Api")
 
-		apiV1 = app.Group("/api/v1", Api.JWTAuthentication(userStore))
+		apiV1 = app.Group("/Api/v1", Api.JWTAuthentication(userStore))
 		admin = apiV1.Group("/admin", Api.AdminAuth)
 	)
 
-	//auth api routes
+	//auth Api routes
 	auth.Post("/auth", authHandler.HandleAuthenticate)
 
 	// Api V1

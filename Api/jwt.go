@@ -13,7 +13,7 @@ func JWTAuthentication(userStore db.UserStore) fiber.Handler {
 		fmt.Println("--JWT authentication")
 		token, ok := ctx.GetReqHeaders()["X-Api-Token"]
 		if !ok {
-			return fmt.Errorf("unauthorized")
+			return ErrorUnauthorized()
 		}
 
 		claims, err := parseJWTToken(token)
@@ -26,7 +26,7 @@ func JWTAuthentication(userStore db.UserStore) fiber.Handler {
 		userID := claims["id"].(string)
 		user, err := userStore.GetUserById(ctx.Context(), userID)
 		if err != nil {
-			return err
+			return ErrorUnauthorized()
 		}
 		ctx.Context().SetUserValue("user", user)
 
@@ -39,7 +39,7 @@ func parseJWTToken(tokenString string) (jwt.MapClaims, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			fmt.Println("invalid signature method", token.Header["alg"])
-			return nil, fmt.Errorf("unathorized")
+			return nil, ErrorUnauthorized()
 		}
 
 		secret := os.Getenv("JWT_SECRET")
@@ -48,7 +48,7 @@ func parseJWTToken(tokenString string) (jwt.MapClaims, error) {
 	})
 	if err != nil {
 		fmt.Println("failed to parse JWT token:", err)
-		return nil, fmt.Errorf("unathorized")
+		return nil, ErrorUnauthorized()
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)

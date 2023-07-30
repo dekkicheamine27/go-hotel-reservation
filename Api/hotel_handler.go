@@ -23,7 +23,7 @@ func (h *HotelHandler) GetHotels(ctx *fiber.Ctx) error {
 	c := context.Background()
 	hotels, err := h.store.Hotel.GetHotel(c, bson.M{})
 	if err != nil {
-		return err
+		return ErrNotResourceNotFound("hotels")
 	}
 	return ctx.JSON(hotels)
 }
@@ -49,7 +49,7 @@ func (h *HotelHandler) GetHotel(ctx *fiber.Ctx) error {
 	c := context.Background()
 	hotel, err := h.store.Hotel.GetHotelById(c, id)
 	if err != nil {
-		return err
+		return ErrNotResourceNotFound("hotel")
 	}
 	return ctx.JSON(hotel)
 
